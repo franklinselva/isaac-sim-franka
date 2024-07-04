@@ -1,0 +1,8 @@
+[submodule "ros_ws/src/franka_ros"]
+path = ros_ws/src/franka_ros
+url = https://github.com/frankaemika/franka_ros2.git
+branch = humble
+[submodule "ros_ws/src/franka_description"]
+path = ros_ws/src/franka_description
+url = https://github.com/frankaemika/franka_description.git
+branch = main

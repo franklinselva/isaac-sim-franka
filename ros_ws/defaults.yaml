@@ -1,0 +1,9 @@
+{
+    build: {
+        symlink-install: true,
+        parallel-workers: 3,
+        packages-skip: ["franka_ign_ros2_control", "franka_gazebo"],
+        cmake-args: ["-DCMAKE_BUILD_TYPE=Release"], # Release, RelWithDebInfo
+    }
+}
+
