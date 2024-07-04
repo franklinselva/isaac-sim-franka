@@ -1,0 +1,109 @@
+#!/bin/bash
+
+set -e
+
+
+print_color() {
+    local color=$1
+    shift
+    echo -e "\033[${color}m$@\033[0m"
+}
+
+print_usage() {
+    print_color "32" "Usage: $0 [bash_script_args] -- [python_script] [python_script_args]"
+    print_color "32" "Isaac Sim arguments:"
+    print_color "32" "  --isaac-dir <path>  Path to Isaac Sim directory"
+    print_color "32" "Example: $0 --isaac-dir /path/to/isaac -- --scene my_scene.usd"
+}
+
+check_dir() {
+    local dir=$1
+    if [ ! -d "$dir" ]; then
+        print_color "31" "Error: Directory '$dir' does not exist"
+        exit 1
+    fi
+}
+
+# Check if at least one argument is provided
+if [ $# -eq 0 ]; then
+    print_usage
+    exit 1
+fi
+
+# Initialize variables
+bash_args=()
+python_args=()
+split_args=false
+
+# Loop through all arguments
+for arg in "$@"; do
+    if [ "$arg" == "--" ]; then
+        # After '--', all arguments are for the Python script
+        split_args=true
+    elif [ "$split_args" = true ]; then
+        python_args+=("$arg")
+    else
+        bash_args+=("$arg")
+    fi
+done
+
+# Now, you can process bash_args for the Bash script
+# For example, handling --isaac-dir argument
+for i in "${!bash_args[@]}"; do
+    if [ "${bash_args[$i]}" == "--isaac-dir" ]; then
+        ISAAC_DIR="${bash_args[$i + 1]}"
+        break
+    fi
+done
+
+# Check if ISAAC_DIR is set
+if [ -z "$ISAAC_DIR" ]; then
+    print_color "31" "Error: --isaac-dir argument is required"
+    print_usage
+    exit 1
+fi
+
+# Example of using ISAAC_DIR
+print_color "32" "ISAAC_DIR: $ISAAC_DIR"
+
+export CARB_APP_PATH=$ISAAC_DIR/kit
+export ISAAC_PATH=$ISAAC_DIR
+export EXP_PATH=$ISAAC_DIR/apps
+
+check_dir "$ISAAC_DIR"
+check_dir "$CARB_APP_PATH"
+check_dir "$ISAAC_PATH"
+check_dir "$EXP_PATH"
+
+print_color "32" "Sourcing setup_python_env.sh"
+# shellcheck disable=SC1091
+source "${ISAAC_DIR}"/setup_python_env.sh
+
+# By default use our python, but allow overriding it by checking if PYTHONEXE env var is defined:
+python_exe=${PYTHONEXE:-"${ISAAC_DIR}/kit/python/bin/python3"}
+
+if ! [[ -z "${CONDA_PREFIX}" ]]; then
+    echo "Warning: running in conda env, please deactivate before executing this script"
+    echo "If conda is desired please source setup_conda_env.sh in your python 3.10 conda env and run python normally"
+fi
+
+# Check if we are running in a docker container
+if [ -f /.dockerenv ]; then
+    # Check for vulkan in docker container
+    if [[ -f "${ISAAC_DIR}/vulkan_check.sh" ]]; then
+        "${ISAAC_DIR}"/vulkan_check.sh
+    fi
+fi
+
+# Show icon if not running headless
+export RESOURCE_NAME="IsaacSim"
+# WAR for missing libcarb.so
+export LD_PRELOAD=$ISAAC_DIR/kit/libcarb.so
+
+# When calling the Python script, pass the python_args
+# Example: assuming the first python_arg is the script name
+python_script="${python_args[0]}"
+python_script_args=("${python_args[@]:1}") # All args except the first
+
+# Example Python call (adjust according to your needs)
+$python_exe "$python_script" "${python_script_args[@]}"
