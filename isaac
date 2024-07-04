@@ -102,8 +102,8 @@ export LD_PRELOAD=$ISAAC_DIR/kit/libcarb.so
 
 # When calling the Python script, pass the python_args
 # Example: assuming the first python_arg is the script name
-python_script="${python_args[0]}"
+python_script="launcher.__main__"
 python_script_args=("${python_args[@]:1}") # All args except the first
 
 # Example Python call (adjust according to your needs)
-$python_exe "$python_script" "${python_script_args[@]}"
+$python_exe -m "$python_script" "${python_script_args[@]}"
