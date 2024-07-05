@@ -42,6 +42,7 @@ def robot_state_publisher_spawner(context: LaunchContext, load_gripper, ee_id):
             name="robot_state_publisher",
             output="screen",
             parameters=[{"robot_description": robot_description}],
+            remappings=[("/joint_states", "/isaac_joint_states")],
         )
     ]
 
