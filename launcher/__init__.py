@@ -5,6 +5,8 @@ from isaacsim import SimulationApp
 # Simulation app should be created first and once to load all the shared libraries and initialize the simulation
 CONFIG = {"renderer": "RayTracedLighting", "headless": False}
 
+ROS_DOMAIN_ID = 0
+
 SIMULATION = SimulationApp(CONFIG)
 
 
