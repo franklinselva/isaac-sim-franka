@@ -25,6 +25,7 @@ def main():
         franka_arm.setup,
         franka_arm.declare_action_graph,
         franka_arm.setup_camera,
+        franka_arm.add_objects,
     ]
 
     for step in setup_steps:

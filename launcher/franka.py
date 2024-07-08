@@ -68,6 +68,17 @@ class FrankaArm:
             target_prim_paths=[self._camera_prim_path],
         )
 
+    def add_objects(self):
+        """Add objects to the scene."""
+        prims.create_prim(
+        "/soup_can",
+        "Xform",
+        position=np.array([0.1, -0.25, 0.10]),
+        orientation=rotations.gf_rotation_to_np_array(Gf.Rotation(Gf.Vec3d(1, 0, 0), -90)),
+        usd_path=self._assets_root_path
+        + "/Isaac/Props/YCB/Axis_Aligned_Physics/005_tomato_soup_can.usd",
+    )
+
     def declare_action_graph(self):
         """Declare the action graph for the Franka Emika Panda robot with ROS component nodes."""
         try:
