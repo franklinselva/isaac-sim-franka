@@ -28,6 +28,16 @@ This repository handles the useful scripts and configurations for interacting wi
 1. Start Isaac Sim
    1. Run the bash script to start the Isaac Sim environment
       ```bash
-      ./isaac --isaac-dir <path-to-isaac-sim> -- launcher.py
+      ./isaac --isaac-dir <path-to-isaac-sim>
       ```
 2. Start **ROS2**
+   1. To start the demo launch file,
+      ```bash
+      # From the root of the workspace,
+      cd ros_ws/
+      colcon build
+      source ./install/setup.bash
+
+      # Now start the demo launch file
+      ros2 launch franka_demo demo.launch.py
+      ```
