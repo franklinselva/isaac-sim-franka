@@ -87,6 +87,107 @@ class FrankaArm:
                 {
                     og.Controller.Keys.CREATE_NODES: [
                         ("OnImpulseEvent", "omni.graph.action.OnImpulseEvent"),
+                        (
+                            "ReadSimTime",
+                            "omni.isaac.core_nodes.IsaacReadSimulationTime",
+                        ),
+                        ("Context", "omni.isaac.ros2_bridge.ROS2Context"),
+                        (
+                            "PublishJointState",
+                            "omni.isaac.ros2_bridge.ROS2PublishJointState",
+                        ),
+                        (
+                            "SubscribeJointState",
+                            "omni.isaac.ros2_bridge.ROS2SubscribeJointState",
+                        ),
+                        (
+                            "ArticulationController",
+                            "omni.isaac.core_nodes.IsaacArticulationController",
+                        ),
+                        ("PublishClock", "omni.isaac.ros2_bridge.ROS2PublishClock"),
+                    ],
+                    og.Controller.Keys.CONNECT: [
+                        (
+                            "OnImpulseEvent.outputs:execOut",
+                            "PublishJointState.inputs:execIn",
+                        ),
+                        (
+                            "OnImpulseEvent.outputs:execOut",
+                            "SubscribeJointState.inputs:execIn",
+                        ),
+                        (
+                            "OnImpulseEvent.outputs:execOut",
+                            "PublishClock.inputs:execIn",
+                        ),
+                        (
+                            "OnImpulseEvent.outputs:execOut",
+                            "ArticulationController.inputs:execIn",
+                        ),
+                        ("Context.outputs:context", "PublishJointState.inputs:context"),
+                        (
+                            "Context.outputs:context",
+                            "SubscribeJointState.inputs:context",
+                        ),
+                        ("Context.outputs:context", "PublishClock.inputs:context"),
+                        (
+                            "ReadSimTime.outputs:simulationTime",
+                            "PublishJointState.inputs:timeStamp",
+                        ),
+                        (
+                            "ReadSimTime.outputs:simulationTime",
+                            "PublishClock.inputs:timeStamp",
+                        ),
+                        (
+                            "SubscribeJointState.outputs:jointNames",
+                            "ArticulationController.inputs:jointNames",
+                        ),
+                        (
+                            "SubscribeJointState.outputs:positionCommand",
+                            "ArticulationController.inputs:positionCommand",
+                        ),
+                        (
+                            "SubscribeJointState.outputs:velocityCommand",
+                            "ArticulationController.inputs:velocityCommand",
+                        ),
+                        (
+                            "SubscribeJointState.outputs:effortCommand",
+                            "ArticulationController.inputs:effortCommand",
+                        ),
+                    ],
+                    og.Controller.Keys.SET_VALUES: [
+                        # Setting the /Franka target prim to Articulation Controller node
+                        (
+                            "ArticulationController.inputs:robotPath",
+                            self._franka_stage_path,
+                        ),
+                        ("PublishJointState.inputs:topicName", "isaac_joint_states"),
+                        (
+                            "SubscribeJointState.inputs:topicName",
+                            "isaac_joint_commands",
+                        ),
+                        (
+                            "PublishJointState.inputs:targetPrim",
+                            [usdrt.Sdf.Path(self._franka_stage_path)],
+                        ),
+                        (
+                            "PublishTF.inputs:targetPrims",
+                            [usdrt.Sdf.Path(self._franka_stage_path)],
+                        ),
+                    ],
+                },
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            print(e)
+
+    # FIXME: Action graph has time dependency on camera setup specifically on the viewport creation
+    def declare_action_graph_camera(self):
+        """Declare the action graph for the Franka Emika Panda robot with ROS component nodes."""
+        try:
+            og.Controller.edit(
+                {"graph_path": "/ActionGraph", "evaluator_name": "execution"},
+                {
+                    og.Controller.Keys.CREATE_NODES: [
+                        ("OnImpulseEvent", "omni.graph.action.OnImpulseEvent"),
                             ("ReadSimTime", "omni.isaac.core_nodes.IsaacReadSimulationTime"),
                         ("Context", "omni.isaac.ros2_bridge.ROS2Context"),
                         ("PublishJointState", "omni.isaac.ros2_bridge.ROS2PublishJointState"),
